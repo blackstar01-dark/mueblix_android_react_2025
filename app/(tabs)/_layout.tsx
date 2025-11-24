@@ -1,35 +1,75 @@
 import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { Platform, View, StyleSheet } from 'react-native';
+import colors from '@/constants/colores';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+
+
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            backgroundColor: colors.background,
+            borderTopColor: '#111827',
+            height: Platform.OS === 'ios' ? 90 : 70,
+            paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+          },
+        ],
+        tabBarActiveTintColor: colors.active,
+        tabBarInactiveTintColor: colors.inactive,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: 2,
+        },
+        tabBarItemStyle: {
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Inicio',
+          tabBarIcon: ({ color, size }) => (
+            <View style={styles.iconWrapper}>
+              <Ionicons name="home-outline" size={size} color={color} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="about"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Búsqueda',
+          tabBarIcon: ({ color, size }) => (
+            <View style={styles.iconWrapper}>
+              <Ionicons name="search-outline" size={size} color={color} />
+            </View>
+          ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 8,
+  },
+  iconWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

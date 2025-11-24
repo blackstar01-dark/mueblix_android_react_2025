@@ -1,98 +1,102 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { View, SafeAreaView, Text, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { getProductos, getProductosDetails } from '../../hook/api';
+import ProductoList from "@/components/productoList";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function Index() {
+  type Producto = { id: string; nombre: string; precio: number | string };
 
-export default function HomeScreen() {
+  const [productos, setProductos] = useState<Producto[]>([]);
+
+  useEffect(() => {
+    (async () => await loadProductos())();
+  }, []);
+
+  const loadProductos = async () => {
+    try {
+      const response = await getProductos();
+      const detallesArray: Producto[] = [];
+
+      for await (const producto of response.data) {
+        const productoDetails = await getProductosDetails(producto._id);
+
+        detallesArray.push({
+          id: productoDetails.data._id,
+          nombre: productoDetails.data.nombre,
+          precio: productoDetails.data.precio,
+        });
+      }
+
+      setProductos(detallesArray);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView style={styles.safeArea}>
+      {/* Encabezado centrado y más grande */}
+      <View style={styles.headerContainer}>
+        <View style={styles.headerCard}>
+          <Text style={styles.headerTitle}>Mueblix</Text>
+          <Text style={styles.headerSubtitle}>Encuentra los mejores muebles para tu hogar</Text>
+        </View>
+      </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      {/* Scroll principal */}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 120 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <ProductoList productos={productos} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#1f2937",
+  },
+  headerContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  headerCard: {
+    width: '100%',
+    backgroundColor: "#111827",
+    borderRadius: 24,
+    paddingVertical: 40,   // mayor altura
+    paddingHorizontal: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: "#222",
+    alignItems: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  headerTitle: {
+    fontSize: 36,   // más grande
+    fontWeight: "bold",
+    color: "#22c55e",
+    textAlign: 'center',
+  },
+  headerSubtitle: {
+    fontSize: 18,   // más grande
+    fontWeight: "500",
+    color: "#d1d5db",
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  scroll: {
+    flex: 1,
+    paddingHorizontal: 12,
+    marginTop: 16,
   },
 });
