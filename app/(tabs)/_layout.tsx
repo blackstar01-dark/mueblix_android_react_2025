@@ -46,12 +46,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="about"
+        name="profile"
         options={{
-          title: 'Búsqueda',
+          title: 'Perfil',
           tabBarIcon: ({ color, size }) => (
             <View style={styles.iconWrapper}>
-              <Ionicons name="search-outline" size={size} color={color} />
+              <Ionicons name="person-outline" size={size} color={color} />
             </View>
           ),
         }}

@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { View, Text, StyleSheet, Animated, TouchableWithoutFeedback } from "react-native";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 type Producto = {
   id: string;
@@ -9,88 +9,87 @@ type Producto = {
 
 type Props = {
   item: Producto;
+  onPress?: () => void;
+  onAddToCart?: () => void;
+  style?: object;
 };
 
-export default function ProductoCard({ item }: Props) {
-  const scale = useRef(new Animated.Value(1)).current;
-
-  const onPressIn = () => {
-    Animated.spring(scale, {
-      toValue: 0.97,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const onPressOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
-  };
-
+export default function ProductoCard({ item, onPress, onAddToCart, style }: Props) {
   return (
-    <TouchableWithoutFeedback onPressIn={onPressIn} onPressOut={onPressOut}>
-      <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
-        
-        {/* Simulación de imagen */}
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.imageText}>Imagen</Text>
-        </View>
+    <View style={[styles.card, style]}>
+      <Text style={styles.nombre}>{item.nombre}</Text>
+      <Text style={styles.precio}>${item.precio}</Text>
 
-        {/* Nombre del producto */}
-        <Text style={styles.name} numberOfLines={2}>
-          {item.nombre}
-        </Text>
-
-        {/* Precio */}
-        <Text style={styles.price}>${Number(item.precio).toFixed(2)}</Text>
-      </Animated.View>
-    </TouchableWithoutFeedback>
+      <View style={styles.buttons}>
+        {onPress && (
+          <TouchableOpacity style={styles.btnDetalle} onPress={onPress}>
+            <Text style={styles.btnTextDetalle}>Ver detalles →</Text>
+          </TouchableOpacity>
+        )}
+        {onAddToCart && (
+          <TouchableOpacity style={styles.btnAgregar} onPress={onAddToCart}>
+            <Text style={styles.btnTextAgregar}>Agregar al carrito</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: "48%",
-    backgroundColor: "#1f2937", // gris medio
+    backgroundColor: "#1e293b",
     borderRadius: 16,
-    padding: 12,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: "#111827",
+    padding: 16, // aumentamos padding
+    justifyContent: "space-between",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
     elevation: 5,
   },
-  imagePlaceholder: {
-    width: "100%",
-    height: 120,
-    backgroundColor: "#111827", // gris oscuro
+  nombre: { 
+    color: "#fff", 
+    fontWeight: "700", 
+    fontSize: 18, // aumentado
+    marginBottom: 6 
+  },
+  precio: { 
+    color: "#22c55e", 
+    fontWeight: "700", 
+    fontSize: 16, // aumentado
+    marginBottom: 10 
+  },
+  buttons: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    marginTop: 10 
+  },
+  btnDetalle: {
+    flex: 1,
+    backgroundColor: "#0f172a",
+    paddingVertical: 10, // aumentado
     borderRadius: 12,
-    marginBottom: 12,
-    justifyContent: "center",
+    marginRight: 8,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#22272e",
+    borderColor: "#22c55e",
   },
-  imageText: {
-    color: "#9ca3af", // gris claro para texto de placeholder
-    fontSize: 14,
-    fontStyle: "italic",
+  btnTextDetalle: { 
+    color: "#22c55e", 
+    fontSize: 14, // aumentado
+    fontWeight: "700" 
   },
-  name: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-    marginBottom: 6,
+  btnAgregar: {
+    flex: 1,
+    backgroundColor: "#22c55e",
+    paddingVertical: 10, // aumentado
+    borderRadius: 12,
+    marginLeft: 8,
+    alignItems: "center",
   },
-  price: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#22c55e", // verde Mueblix
+  btnTextAgregar: { 
+    color: "#0f172a", 
+    fontSize: 14, // aumentado
+    fontWeight: "700" 
   },
 });
